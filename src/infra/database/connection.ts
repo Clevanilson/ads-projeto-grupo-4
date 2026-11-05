@@ -13,7 +13,7 @@ export abstract class DB {
     }
   }
 
-  static obter<T>(sql: string, args: unknown[] = []): T[] {
+  static obter<T = any>(sql: string, args: unknown[] = []): T[] {
     const db = new DatabaseSync(dbPath);
 
     try {
