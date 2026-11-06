@@ -14,6 +14,7 @@ export function tratarErros(callback: Handler): Handler {
       if (e instanceof ErroAplicacao) {
         return Response.json({ mensagem: e.message }, { status: 400 });
       } else {
+        console.error(e);
         return Response.json(
           { mensagem: "Erro inesperado, tente novamente" },
           { status: 500 },

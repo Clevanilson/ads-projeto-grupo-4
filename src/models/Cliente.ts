@@ -1,6 +1,6 @@
 import { DB } from "@/infra/database/connection";
 import { ErroDominio } from "../erro/dominio";
-import { throwDeprecation } from "process";
+import { ItensPaginados } from "@/types/paginacao";
 
 export class ClienteModel {
   private id?: number;
@@ -9,6 +9,7 @@ export class ClienteModel {
   private dataNascimento: Date;
 
   constructor(input: ClienteDTO) {
+    this.id = input.id;
     this.nome = input.nome.trim();
     this.telefone = input.telefone;
     this.dataNascimento = new Date(input.data_nascimento);
@@ -25,6 +26,22 @@ export class ClienteModel {
     return row ? new ClienteModel(row) : undefined;
   }
 
+  static listar(pagina: number): ItensPaginados<ClienteDTO> {
+    const porPagina = 5;
+    const rows = DB.obter(`SELECT * FROM clientes LIMIT ? OFFSET ?`, [
+      porPagina,
+      (pagina - 1) * porPagina,
+    ]);
+    const [row] = DB.obter("SELECT count(*) as totalItens FROM clientes ");
+    const { totalItens } = row;
+    const dados: ClienteDTO[] = [];
+    rows.forEach((row) => {
+      const model = new ClienteModel(row);
+      dados.push(model.json());
+    });
+    return { dados, paginacao: { porPagina, pagina, totalItens } };
+  }
+
   salvar(): ClienteDTO {
     const [row] = DB.obter(
       `
@@ -34,6 +51,7 @@ export class ClienteModel {
     `,
       [this.nome, this.telefone, this.dataNascimento.toISOString()],
     );
+    this.id = row.id;
     return this.json();
   }
 

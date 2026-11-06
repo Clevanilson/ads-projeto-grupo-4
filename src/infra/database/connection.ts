@@ -1,9 +1,9 @@
-import { DatabaseSync } from "node:sqlite";
+import { DatabaseSync, SQLInputValue } from "node:sqlite";
 import path from "node:path";
 const dbPath = path.join(process.cwd(), "src/infra/database/dev.sqlite");
 
 export abstract class DB {
-  static executar(sql: string, args: unknown[] = []) {
+  static executar(sql: string, args: SQLInputValue[] = []) {
     const db = new DatabaseSync(dbPath);
 
     try {
@@ -13,7 +13,8 @@ export abstract class DB {
     }
   }
 
-  static obter<T = any>(sql: string, args: unknown[] = []): T[] {
+  //  eslint-disable-next-line
+  static obter<T = any>(sql: string, args: SQLInputValue[] = []): T[] {
     const db = new DatabaseSync(dbPath);
 
     try {
